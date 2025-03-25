@@ -1,77 +1,48 @@
-name: CI
-
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # Checkout du code source
+      - uses: actions/checkout@v4
 
-      # Used to cache dependencies with a timeout
-      - name: Get Date
-        id: get-date
-        run: |
-          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
-        shell: bash
-
-      - name: Cache Buildozer global directory
+      # Caching des dépendances de Buildozer pour accélérer les builds
+      - name: Cache Buildozer dependencies
         uses: actions/cache@v3
         with:
-          path: .buildozer_global
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
+          path: ~/.buildozer
+          key: ${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-
 
-      - uses: actions/cache@v3
+      # Caching des dépendances Python pour accélérer les installations
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
         with:
-          path: .buildozer
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      # Install dependencies
+      # Installation des dépendances de Buildozer
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt-get install -y \
             build-essential \
             git \
-            ffmpeg \
-            libsdl2-dev \
-            libsdl2-image-dev \
-            libsdl2-mixer-dev \
-            libsdl2-ttf-dev \
-            libportmidi-dev \
-            libswscale-dev \
-            libavformat-dev \
-            libavcodec-dev \
-            libunwind-dev \
-            zlib1g-dev
-          sudo apt-get install -y \
-            libsqlite3-dev \
-            sqlite3 \
-            bzip2 \
-            libbz2-dev \
-            zlib1g-dev \
-            openssl \
-            libgdbm-dev \
-            libgdbm-compat-dev \
-            liblzma-dev \
-            libreadline-dev \
-            uuid-dev \
-            libgstreamer1.0 \
-            gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good
-          sudo apt-get install -y \
             zip \
             unzip \
+            openjdk-17-jdk \
+            python3-pip \
             autoconf \
             libtool \
             pkg-config \
+            zlib1g-dev \
             libncurses5-dev \
             libncursesw5-dev \
             libtinfo5 \
@@ -79,35 +50,39 @@ jobs:
             libffi-dev \
             libssl-dev \
             automake
+        shell: bash
 
-      # Set up Java 17 required by Gradle
-      - name: Setup Java 17 required by Gradle
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'  # or 'zulu', 'liberica', etc.
-          java-version: '17'
-
-      # Set up Python
+      # Installation de Python et des dépendances nécessaires
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.8'
 
-      # Install pip dependencies
       - name: Install pip dependencies
         run: |
           pip install --upgrade pip
           pip install buildozer cython==0.29.33
+        shell: bash
 
-      # Build with Buildozer
-      - name: Build with Buildozer
-        id: buildozer
+      # Buildozer command pour construire l'APK
+      - name: Build APK with Buildozer
+        uses: digreatbrian/buildozer-action@v2
+        with:
+          python-version: 3.8
+          buildozer-cmd: buildozer -v android debug
+
+      # Vérification si le build a échoué ou réussi
+      - name: Check for APK build success
         run: |
-          yes | buildozer -v android debug
+          if [ ! -f ./bin/*.apk ]; then
+            echo "Build failed: APK not found"
+            exit 1
+          fi
+        shell: bash
 
-      # Upload artifacts
+      # Upload des artifacts (APK généré)
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: package
-          path: bin/*.apk
+          path: ./bin/*.apk
