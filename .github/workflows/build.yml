@@ -7,12 +7,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Étape d'installation des dépendances nécessaires
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libtinfo6
+          sudo apt-get install -y python3-pip
+          sudo apt-get install -y build-essential
+          sudo apt-get install -y libssl-dev
+          sudo apt-get install -y libffi-dev
+          sudo apt-get install -y libsqlite3-dev
+          sudo apt-get install -y libjpeg-dev
+          sudo apt-get install -y libfreetype6-dev
+          sudo apt-get install -y liblcms2-dev
+          sudo apt-get install -y libblas-dev
+          sudo apt-get install -y liblapack-dev
+
+      # Étape Buildozer pour compiler l'APK
       - name: Build APK
         uses: digreatbrian/buildozer-action@v2
         with:
           python-version: 3.8
           buildozer-cmd: buildozer -v android debug
 
+      # Étape de téléversement des artefacts
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
