@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04  # Utilisation d'Ubuntu 20.04
+    runs-on: ubuntu-20.04  # Utilisation d'Ubuntu 20.04 pour plus de compatibilité
 
     steps:
       - name: Checkout repository
@@ -21,8 +21,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
+          sudo apt install -y software-properties-common
+          sudo add-apt-repository universe  # Ajoute le dépôt 'universe'
+          sudo apt update  # Met à jour les listes après avoir ajouté le dépôt
           sudo apt install -y \
-            libncurses6-dev \
+            libncurses5 \
+            libncurses5:i386 \  # Installe les versions 32 bits de libncurses si nécessaire
             libreadline-dev \
             libffi-dev \
             libssl-dev \
