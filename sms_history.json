@@ -1,0 +1,26 @@
+[
+    {
+        "to": "00243999135613",
+        "from": "Mulele",
+        "message": "salut ! tout va bien ???",
+        "status": "Echec"
+    },
+    {
+        "to": "00243817038012",
+        "from": "Mulele",
+        "message": "salut ! tout va bien ???",
+        "status": "Echec"
+    },
+    {
+        "to": "+243999135613",
+        "from": "Mulele",
+        "message": "salut ! ccccc",
+        "status": "Echec"
+    },
+    {
+        "to": "+243899992351",
+        "from": "Mulele",
+        "message": "salut ! ccccc",
+        "status": "Echec"
+    }
+]

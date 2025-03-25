@@ -1,0 +1,7 @@
+et mon fichier MyApplication.java est dans le meme direction de dossier : mon fichier est ici : android/
+│   ├── app/
+│   │   ├── src/
+│   │   │   ├── main/  java/
+│   │   │   │   │   └── org/
+│   │   │   │   │       └── kivy/
+│   │   │   │   │           └── android/MyApplication/java
