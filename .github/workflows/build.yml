@@ -1,14 +1,6 @@
-name: Build APK
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   build:
-    runs-on: ubuntu-20.04  # Utilisation d'Ubuntu 20.04 pour plus de compatibilité
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,15 +10,16 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Enable Universe repository and add architecture i386
+        run: |
+          sudo add-apt-repository universe
+          sudo dpkg --add-architecture i386
+          sudo apt update
+
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y software-properties-common
-          sudo add-apt-repository universe  # Ajoute le dépôt 'universe'
-          sudo apt update  # Met à jour les listes après avoir ajouté le dépôt
+          sudo apt install -y libncurses6 libncurses6:i386
           sudo apt install -y \
-            libncurses5 \
-            libncurses5:i386 \  # Installe les versions 32 bits de libncurses si nécessaire
             libreadline-dev \
             libffi-dev \
             libssl-dev \
