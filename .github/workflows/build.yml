@@ -1,86 +1,54 @@
+name: Build APK
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout du code source
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # Caching des dépendances de Buildozer pour accélérer les builds
-      - name: Cache Buildozer dependencies
-        uses: actions/cache@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          path: ~/.buildozer
-          key: ${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
-          restore-keys: |
-            ${{ runner.os }}-
+          python-version: 3.8
 
-      # Caching des dépendances Python pour accélérer les installations
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      # Installation des dépendances de Buildozer
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt-get install -y \
-            build-essential \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            python3-pip \
+          sudo apt install -y \
+            libncurses6-dev \
+            libreadline-dev \
+            libffi-dev \
+            libssl-dev \
             autoconf \
             libtool \
             pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libtinfo5 \
+            zip \
+            unzip \
+            python3-pip \
             cmake \
-            libffi-dev \
-            libssl-dev \
-            automake
+            libsqlite3-dev \
+            sqlite3 \
+            bzip2 \
+            libbz2-dev
         shell: bash
 
-      # Installation de Python et des dépendances nécessaires
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.8'
-
-      - name: Install pip dependencies
+      - name: Install Buildozer dependencies
         run: |
-          pip install --upgrade pip
-          pip install buildozer cython==0.29.33
+          python3 -m pip install --upgrade Cython==0.29.33 buildozer
         shell: bash
 
-      # Buildozer command pour construire l'APK
       - name: Build APK with Buildozer
-        uses: digreatbrian/buildozer-action@v2
-        with:
-          python-version: 3.8
-          buildozer-cmd: buildozer -v android debug
-
-      # Vérification si le build a échoué ou réussi
-      - name: Check for APK build success
         run: |
-          if [ ! -f ./bin/*.apk ]; then
-            echo "Build failed: APK not found"
-            exit 1
-          fi
+          buildozer -v android debug
         shell: bash
 
-      # Upload des artifacts (APK généré)
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
