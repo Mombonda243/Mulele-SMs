@@ -1,4 +1,4 @@
-name: Build APK
+name: Build APK 
 
 on:
   push:
@@ -10,17 +10,14 @@ jobs:
     runs-on: ubuntu-20.04  # Tu peux aussi essayer ubuntu-22.04 si nécessaire
 
     steps:
-      # Étape 1: Checkout du repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Étape 2: Installation de Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8  # Spécifie la version de Python à utiliser
+          python-version: 3.8
 
-      # Étape 3: Installation des dépendances système
       - name: Install dependencies
         run: |
           sudo apt update
@@ -43,19 +40,16 @@ jobs:
             libbz2-dev
         shell: bash
 
-      # Étape 4: Installation des packages .deb locaux
       - name: Install local .deb packages
         run: |
           sudo dpkg -i lib64tinfo6_6.5+20250216-2_amd64.deb || sudo apt-get install -f -y
         shell: bash
 
-      # Étape 5: Installation des dépendances pour Buildozer
       - name: Install Buildozer dependencies
         run: |
           python3 -m pip install --upgrade Cython==0.29.33 buildozer
         shell: bash
 
-      # Étape 6: Installation de Gradle version 7.4
       - name: Install Gradle
         run: |
           wget https://services.gradle.org/distributions/gradle-7.4-bin.zip
@@ -64,31 +58,34 @@ jobs:
           echo "export PATH=/opt/gradle/gradle-7.4/bin:$PATH" >> $HOME/.bashrc
           echo "export PATH=/opt/gradle/gradle-7.4/bin:$PATH" >> $HOME/.profile
           export PATH=/opt/gradle/gradle-7.4/bin:$PATH
-          gradle -v  # Vérification de l'installation
+          gradle -v
         shell: bash
 
-      # Étape 7: Installation du NDK 23.1.7779620 si absent
-      - name: Install Android NDK 23b
+      - name: Install Android SDK and NDK 23.1.7779620
         run: |
-          yes | sdkmanager --install "ndk;23.1.7779620"
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
+
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          cd $ANDROID_HOME/cmdline-tools
+
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+          unzip commandlinetools-linux-8512546_latest.zip
+          mv cmdline-tools latest
+
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "ndk;23.1.7779620"
+
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.1.7779620" >> $GITHUB_ENV
+          echo "ANDROID_NDK=$ANDROID_HOME/ndk/23.1.7779620" >> $GITHUB_ENV
         shell: bash
 
-      # Étape 8: Forcer Buildozer à utiliser NDK 23b
-      - name: Set NDK version
-        run: |
-          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/23.1.7779620" >> $GITHUB_ENV
-          echo "ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/23.1.7779620" >> $GITHUB_ENV
-        shell: bash
-
-      # Étape 9: Compilation de l'APK avec Buildozer (mode verbose activé)
       - name: Build APK with Buildozer
         run: |
-          buildozer android debug 
+          buildozer android debug
         shell: bash
 
-      # Étape 10: Téléversement de l'APK généré en tant qu'artefact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: package  # Nom de l'artefact
-          path: ./bin/*.apk  # Chemin vers l'APK généré
+          name: package
+          path: ./bin/*.apk
