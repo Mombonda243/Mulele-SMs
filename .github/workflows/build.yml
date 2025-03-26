@@ -59,15 +59,15 @@ jobs:
           python3 -m pip install --upgrade Cython==0.29.33 buildozer
         shell: bash
 
-      # Étape 6: Installation de Gradle version 7.6
+      # Étape 6: Installation de Gradle version 7.4
       - name: Install Gradle
         run: |
-          wget https://services.gradle.org/distributions/gradle-7.6-bin.zip
+          wget https://services.gradle.org/distributions/gradle-7.4-bin.zip
           sudo mkdir /opt/gradle
-          sudo unzip -d /opt/gradle gradle-7.6-bin.zip
-          echo "export PATH=/opt/gradle/gradle-7.6/bin:$PATH" >> $HOME/.bashrc
-          echo "export PATH=/opt/gradle/gradle-7.6/bin:$PATH" >> $HOME/.profile
-          export PATH=/opt/gradle/gradle-7.6/bin:$PATH
+          sudo unzip -d /opt/gradle gradle-7.4-bin.zip
+          echo "export PATH=/opt/gradle/gradle-7.4/bin:$PATH" >> $HOME/.bashrc
+          echo "export PATH=/opt/gradle/gradle-7.4/bin:$PATH" >> $HOME/.profile
+          export PATH=/opt/gradle/gradle-7.4/bin:$PATH
           gradle -v  # Vérification de l'installation
         shell: bash
 
