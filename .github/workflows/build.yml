@@ -1,20 +1,78 @@
-name: Install dependencies from local .deb files
+name: Build APK
 
 on:
   push:
     branches:
-      - main
+      - main  # Exécute le processus lors des commits dans la branche 'main'
 
 jobs:
-  install-dependencies:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-20.04  # Tu peux aussi essayer d'utiliser ubuntu-22.04 si nécessaire
 
     steps:
+      # Étape 1: Checkout du repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Étape 2: Installation de Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.8  # Spécifie la version de Python à utiliser
+
+      # Étape 3: Ajout du dépôt personnalisé et installation des dépendances
+      - name: Add custom Ubuntu repository and install dependencies
+        run: |
+          # Ajout du dépôt personnalisé
+          echo "deb [arch=amd64] https://ubuntu.pkgs.org/22.04/ubuntu-main-amd64/ focal main" | sudo tee /etc/apt/sources.list.d/custom-ubuntu.list
+          
+          # Mise à jour des informations des paquets
+          sudo apt update
+          
+          # Installation des paquets nécessaires
+          sudo apt install -y \
+            libncurses6 libncurses6:i386 \
+            libncurses-dev \
+            libreadline-dev \
+            libffi-dev \
+            libssl-dev \
+            autoconf \
+            libtool \
+            pkg-config \
+            zip \
+            unzip \
+            python3-pip \
+            cmake \
+            libsqlite3-dev \
+            sqlite3 \
+            bzip2 \
+            libbz2-dev
+        shell: bash
+
+      # Étape 4: Installation des packages .deb locaux
       - name: Install local .deb packages
         run: |
+          # Installation des fichiers .deb locaux
           sudo dpkg -i lib32ncurses6_6.2+20201114-2+deb11u2_amd64.deb || sudo apt-get install -f -y
           sudo dpkg -i lib64ncurses-dev_6.4-4_i386.deb || sudo apt-get install -f -y
           sudo dpkg -i libncurses5-dev_6.1+20181013-2+deb10u5_amd64.deb || sudo apt-get install -f -y
+        shell: bash
+
+      # Étape 5: Installation des dépendances pour Buildozer
+      - name: Install Buildozer dependencies
+        run: |
+          python3 -m pip install --upgrade Cython==0.29.33 buildozer
+        shell: bash
+
+      # Étape 6: Compilation de l'APK avec Buildozer
+      - name: Build APK with Buildozer
+        run: |
+          buildozer -v android debug
+        shell: bash
+
+      # Étape 7: Téléversement de l'APK généré en tant qu'artefact
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package  # Nom de l'artefact
+          path: ./bin/*.apk  # Chemin vers l'APK généré
