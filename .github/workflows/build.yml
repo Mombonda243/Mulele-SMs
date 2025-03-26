@@ -58,48 +58,14 @@ jobs:
         run: |
           python3 -m pip install --upgrade Cython==0.29.33 buildozer
         shell: bash
-	
-      # Étape 6: Installation de Gradle
-      - name: Install Gradle
-        run: |
-          wget https://services.gradle.org/distributions/gradle-7.4-bin.zip
-          sudo mkdir /opt/gradle
-          sudo unzip -d /opt/gradle gradle-7.4-bin.zip
-          echo "export PATH=/opt/gradle/gradle-7.4/bin:$PATH" >> $HOME/.bashrc
-          echo "export PATH=/opt/gradle/gradle-7.4/bin:$PATH" >> $HOME/.profile
-          export PATH=/opt/gradle/gradle-7.4/bin:$PATH
-          gradle -v
-        shell: bash
 
-      # Étape 7: Installation du SDK et NDK Android
-      - name: Install Android SDK and NDK 23.1.7779620
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
-
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          cd $ANDROID_HOME/cmdline-tools
-
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
-          unzip commandlinetools-linux-8512546_latest.zip
-          mv cmdline-tools latest
-
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "ndk;23.1.7779620"
-
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.1.7779620" >> $GITHUB_ENV
-          echo "ANDROID_NDK=$ANDROID_HOME/ndk/23.1.7779620" >> $GITHUB_ENV
-        shell: bash
-
-      # Étape 8: Compilation de l'APK avec Buildozer
+      # Étape 6: Compilation de l'APK avec Buildozer
       - name: Build APK with Buildozer
         run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/23.1.7779620
-          buildozer android debug
+          buildozer -v android debug
         shell: bash
 
-      # Étape 9: Téléversement de l'APK généré en tant qu'artefact
+      # Étape 7: Téléversement de l'APK généré en tant qu'artefact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
