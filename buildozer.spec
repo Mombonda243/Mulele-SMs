@@ -113,7 +113,7 @@ android.minapi = 21
 
 # (int) Android SDK version to use
 android.sdk = 33
-
+android.gradle_version = 7.4
 # Répertoire des sources Java (si tu utilises des fichiers Java personnalisés)
 #android.src = android/app/src/main/java
 
