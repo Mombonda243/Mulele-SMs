@@ -68,7 +68,7 @@ jobs:
       # Étape 7: Compilation de l'APK avec Buildozer
       - name: Build APK with Buildozer
         run: |
-          buildozer -v android debug
+          buildozer  android debug
         shell: bash
 
       # Étape 8: Téléversement de l'APK généré en tant qu'artefact
