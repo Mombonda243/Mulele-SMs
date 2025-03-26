@@ -1,4 +1,4 @@
-name: Install libncurses5
+name: Install dependencies from local .deb files
 
 on:
   push:
@@ -6,15 +6,15 @@ on:
       - main
 
 jobs:
-  setup:
+  install-dependencies:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Update package index
-        run: sudo apt-get update
-
-      - name: Install libncurses5
-        run: sudo apt-get install -y libncurses5
+      - name: Install local .deb packages
+        run: |
+          sudo dpkg -i lib32ncurses6_6.2+20201114-2+deb11u2_amd64.deb || sudo apt-get install -f -y
+          sudo dpkg -i lib64ncurses-dev_6.4-4_i386.deb || sudo apt-get install -f -y
+          sudo dpkg -i libncurses5-dev_6.1+20181013-2+deb10u5_amd64.deb || sudo apt-get install -f -y
