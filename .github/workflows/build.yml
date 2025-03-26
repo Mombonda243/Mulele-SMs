@@ -20,12 +20,9 @@ jobs:
         with:
           python-version: 3.8  # Spécifie la version de Python à utiliser
 
-      # Étape 3: Ajout du dépôt personnalisé et installation des dépendances
-      - name: Add custom Ubuntu repository and install dependencies
+      # Étape 3: Installation des dépendances
+      - name: Install dependencies
         run: |
-          # Ajout du dépôt personnalisé
-          echo "deb [arch=amd64] https://ubuntu.pkgs.org/22.04/ubuntu-main-amd64/ focal main" | sudo tee /etc/apt/sources.list.d/custom-ubuntu.list
-          
           # Mise à jour des informations des paquets
           sudo apt update
           
