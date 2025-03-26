@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04  # Tu peux aussi essayer d'utiliser ubuntu-22.04 si nécessaire
+    runs-on: ubuntu-20.04  # Essaie ubuntu-22.04 si nécessaire
 
     steps:
       # Étape 1: Checkout du repository
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8  # Spécifie la version de Python à utiliser
+          python-version: 3.8  # Version de Python à utiliser
 
       # Étape 3: Installation des dépendances système
       - name: Install dependencies
@@ -65,13 +65,31 @@ jobs:
           fi
         shell: bash
 
-      # Étape 7: Compilation de l'APK avec Buildozer
-      - name: Build APK with Buildozer
+      # Étape 7: Activation des logs détaillés dans buildozer.spec
+      - name: Enable detailed logging in buildozer.spec
         run: |
-          buildozer android debug
+          if grep -q "log_level" buildozer.spec; then
+            sed -i 's/^log_level = .*/log_level = 2/' buildozer.spec
+          else
+            echo "log_level = 2" >> buildozer.spec
+          fi
         shell: bash
 
-      # Étape 8: Téléversement de l'APK généré en tant qu'artefact
+      # Étape 8: Compilation de l'APK avec logs détaillés
+      - name: Build APK with Buildozer (detailed logs)
+        run: |
+          buildozer -v android debug | tee buildozer_log.txt
+        shell: bash
+
+      # Étape 9: Téléversement du log en cas d'échec
+      - name: Upload Buildozer log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: buildozer_log
+          path: buildozer_log.txt
+
+      # Étape 10: Téléversement de l'APK généré en tant qu'artefact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
