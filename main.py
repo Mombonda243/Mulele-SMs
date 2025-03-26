@@ -29,7 +29,7 @@ from kivy.network.urlrequest import UrlRequest
 import os
 from kivy.clock import Clock
 
-Window.size=(360, 640)
+#Window.size=(360, 640)
 
 
 
