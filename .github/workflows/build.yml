@@ -59,13 +59,25 @@ jobs:
           python3 -m pip install --upgrade Cython==0.29.33 buildozer
         shell: bash
 
-      # Étape 6: Compilation de l'APK avec Buildozer
-      - name: Build APK with Buildozer
+      # Étape 6: Installation de Gradle manuellement
+      - name: Install Gradle
         run: |
-          buildozer -v android debug
+          wget https://services.gradle.org/distributions/gradle-8.3-bin.zip
+          sudo mkdir /opt/gradle
+          sudo unzip -d /opt/gradle gradle-8.3-bin.zip
+          echo "export PATH=/opt/gradle/gradle-8.3/bin:$PATH" >> $HOME/.bashrc
+          echo "export PATH=/opt/gradle/gradle-8.3/bin:$PATH" >> $HOME/.profile
+          export PATH=/opt/gradle/gradle-8.3/bin:$PATH
+          gradle -v  # Vérification de l'installation
         shell: bash
 
-      # Étape 7: Téléversement de l'APK généré en tant qu'artefact
+      # Étape 7: Compilation de l'APK avec Buildozer (mode verbose activé)
+      - name: Build APK with Buildozer
+        run: |
+          buildozer -v android debug --log-level 2
+        shell: bash
+
+      # Étape 8: Téléversement de l'APK généré en tant qu'artefact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
