@@ -106,19 +106,19 @@ android.permissions = android.permission.INTERNET, (name=android.permission.WRIT
 android.src = android/app/src/main/java/org/kivy/android
 
 # (int) Target Android API, should be as high as possible.
-#android.api = 31
+android.api = 31
 
 # (int) Minimum API your APK / AAB will support.
-#android.minapi = 21
+android.minapi = 21
 
 # (int) Android SDK version to use
-#android.sdk = 31
+android.sdk = 31
 
 # Répertoire des sources Java (si tu utilises des fichiers Java personnalisés)
 #android.src = android/app/src/main/java
 
 # (str) Android NDK version to use
-#android.ndk = 23b
+android.ndk = 23b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 android.ndk_api = 21
