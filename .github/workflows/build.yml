@@ -20,13 +20,10 @@ jobs:
         with:
           python-version: 3.8  # Spécifie la version de Python à utiliser
 
-      # Étape 3: Installation des dépendances
+      # Étape 3: Installation des dépendances système
       - name: Install dependencies
         run: |
-          # Mise à jour des informations des paquets
           sudo apt update
-          
-          # Installation des paquets nécessaires (seulement 64 bits)
           sudo apt install -y \
             libncurses6 \
             libncurses-dev \
@@ -49,23 +46,32 @@ jobs:
       # Étape 4: Installation des packages .deb locaux
       - name: Install local .deb packages
         run: |
-          # Installation des fichiers .deb locaux
           sudo dpkg -i lib64tinfo6_6.5+20250216-2_amd64.deb || sudo apt-get install -f -y
         shell: bash
 
-      # Étape 5: Installation des dépendances pour Buildozer
-      - name: Install Buildozer dependencies
+      # Étape 5: Installation et mise à jour de Buildozer et python-for-android
+      - name: Install Buildozer and dependencies
         run: |
-          python3 -m pip install --upgrade Cython==0.29.33 buildozer
+          python3 -m pip install --upgrade Cython==0.29.33 buildozer python-for-android
         shell: bash
 
-      # Étape 6: Compilation de l'APK avec Buildozer
+      # Étape 6: Modification de buildozer.spec pour forcer Gradle 7.4
+      - name: Force Gradle 7.4 in buildozer.spec
+        run: |
+          if grep -q "android.gradle_version" buildozer.spec; then
+            sed -i 's/^android.gradle_version = .*/android.gradle_version = 7.4/' buildozer.spec
+          else
+            echo "android.gradle_version = 7.4" >> buildozer.spec
+          fi
+        shell: bash
+
+      # Étape 7: Compilation de l'APK avec Buildozer
       - name: Build APK with Buildozer
         run: |
           buildozer -v android debug
         shell: bash
 
-      # Étape 7: Téléversement de l'APK généré en tant qu'artefact
+      # Étape 8: Téléversement de l'APK généré en tant qu'artefact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
