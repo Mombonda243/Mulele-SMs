@@ -16,7 +16,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = Assets/*,images/*.png
+source.include_patterns = sms_history.json,blabla.json,Assets/*,images/*.png
 
 # (list) Source files to exclude (let empty to not exclude anything)
 source.exclude_exts = spec
@@ -37,7 +37,7 @@ version = 1.0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,kivymd==1.2.0,json,materialyoucolor,exceptiongroup,asyncgui,asynckivy
+requirements = python3,kivy,kivymd==1.2.0,materialyoucolor,exceptiongroup,asyncgui,asynckivy
 
 
 # (str) Custom source folders for requirements
