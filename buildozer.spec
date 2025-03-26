@@ -103,7 +103,7 @@ android.permissions = android.permission.INTERNET, android.permission.WRITE_EXTE
 #android.features = android.hardware.usb.host
 
 # Répertoire des sources Java (si tu utilises des fichiers Java personnalisés)
-android.src = android/app/src/main/java/org/kivy/android
+#android.src = android/app/src/main/java/org/kivy/android
 
 # (int) Target Android API, should be as high as possible.
 android.api = 33
@@ -188,7 +188,7 @@ android.accept_sdk_license = True
 #android.add_src =
 
 # (list) Android AAR archives to add
-android.add_aars = libs/CastarSdk.aar
+#android.add_aars = libs/CastarSdk.aar
 
 # Nom de la classe d'application (si tu utilises une classe Java personnalisée)
 android.classname = org.kivy.android.MyApplication
