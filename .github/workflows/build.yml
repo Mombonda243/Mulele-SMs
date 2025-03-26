@@ -43,10 +43,11 @@ jobs:
             libbz2-dev
         shell: bash
 
-      # Étape 4: Installation des packages .deb locaux
-      - name: Install local .deb packages
+      # Étape 4: Téléchargement et installation du package .deb
+      - name: Download and install lib64tinfo6
         run: |
-          sudo dpkg -i lib64tinfo6_6.5+20250216-2_amd64.deb || sudo apt-get install -f -y
+          wget -O lib64tinfo6.deb "https://github.com/Mombonda243/Mulele-SMs/raw/main/lib64tinfo6_6.5+20250216-2_i386.deb"
+          sudo dpkg -i lib64tinfo6.deb || sudo apt-get install -f -y
         shell: bash
 
       # Étape 5: Installation et mise à jour de Buildozer et python-for-android
