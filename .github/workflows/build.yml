@@ -55,7 +55,29 @@ jobs:
           python3 -m pip install --upgrade Cython==0.29.33 buildozer python-for-android
         shell: bash
 
-      # Étape 6: Modification de buildozer.spec pour forcer Gradle 4.2.2
+      # Étape 6: Nettoyage et réinstallation du SDK Android
+      - name: Clean and reinstall Android SDK
+        run: |
+          buildozer android clean
+          rm -rf ~/.buildozer/android/platform/android-sdk
+          buildozer android debug
+        shell: bash
+
+      # Étape 7: Installation des build-tools manquants
+      - name: Install missing build-tools
+        run: |
+          yes | sdkmanager --install "build-tools;35.0.1"
+        shell: bash
+
+      # Étape 8: Forcer l'utilisation de la bonne version du NDK
+      - name: Ensure correct NDK version
+        run: |
+          buildozer android clean
+          rm -rf ~/.buildozer/android/platform/android-ndk-*
+          buildozer android debug
+        shell: bash
+
+      # Étape 9: Modification de buildozer.spec pour forcer Gradle 4.2.2
       - name: Force Gradle 4.2.2 in buildozer.spec
         run: |
           if grep -q "android.gradle_version" buildozer.spec; then
@@ -65,7 +87,7 @@ jobs:
           fi
         shell: bash
 
-      # Étape 7: Activation des logs détaillés dans buildozer.spec
+      # Étape 10: Activation des logs détaillés dans buildozer.spec
       - name: Enable detailed logging in buildozer.spec
         run: |
           if grep -q "log_level" buildozer.spec; then
@@ -75,13 +97,13 @@ jobs:
           fi
         shell: bash
 
-      # Étape 8: Compilation de l'APK avec logs détaillés
+      # Étape 11: Compilation de l'APK avec logs détaillés
       - name: Build APK with Buildozer (detailed logs)
         run: |
           buildozer -v android debug | tee buildozer_log.txt
         shell: bash
 
-      # Étape 9: Téléversement du log en cas d'échec
+      # Étape 12: Téléversement du log en cas d'échec
       - name: Upload Buildozer log on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -89,7 +111,7 @@ jobs:
           name: buildozer_log
           path: buildozer_log.txt
 
-      # Étape 10: Téléversement de l'APK généré en tant qu'artefact
+      # Étape 13: Téléversement de l'APK généré en tant qu'artefact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
