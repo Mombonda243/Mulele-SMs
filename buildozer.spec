@@ -33,7 +33,7 @@ version = 1.0
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
-version.filename = %(source.dir)s/main.py
+# version.filename = %(source.dir)s/main.py
 
 
 # (list) Application requirements
