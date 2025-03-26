@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04  # Tu peux aussi essayer d'utiliser ubuntu-22.04 si nécessaire
+    runs-on: ubuntu-20.04  # Tu peux aussi essayer ubuntu-22.04 si nécessaire
 
     steps:
       # Étape 1: Checkout du repository
@@ -20,13 +20,10 @@ jobs:
         with:
           python-version: 3.8  # Spécifie la version de Python à utiliser
 
-      # Étape 3: Installation des dépendances
+      # Étape 3: Installation des dépendances système
       - name: Install dependencies
         run: |
-          # Mise à jour des informations des paquets
           sudo apt update
-          
-          # Installation des paquets nécessaires (seulement 64 bits)
           sudo apt install -y \
             libncurses6 \
             libncurses-dev \
@@ -49,7 +46,6 @@ jobs:
       # Étape 4: Installation des packages .deb locaux
       - name: Install local .deb packages
         run: |
-          # Installation des fichiers .deb locaux
           sudo dpkg -i lib64tinfo6_6.5+20250216-2_amd64.deb || sudo apt-get install -f -y
         shell: bash
 
@@ -71,13 +67,26 @@ jobs:
           gradle -v  # Vérification de l'installation
         shell: bash
 
-      # Étape 7: Compilation de l'APK avec Buildozer (mode verbose activé)
+      # Étape 7: Installation du NDK 23.1.7779620 si absent
+      - name: Install Android NDK 23b
+        run: |
+          yes | sdkmanager --install "ndk;23.1.7779620"
+        shell: bash
+
+      # Étape 8: Forcer Buildozer à utiliser NDK 23b
+      - name: Set NDK version
+        run: |
+          echo "ANDROID_NDK_HOME=$ANDROID_SDK_ROOT/ndk/23.1.7779620" >> $GITHUB_ENV
+          echo "ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/23.1.7779620" >> $GITHUB_ENV
+        shell: bash
+
+      # Étape 9: Compilation de l'APK avec Buildozer (mode verbose activé)
       - name: Build APK with Buildozer
         run: |
           buildozer android debug 
         shell: bash
 
-      # Étape 8: Téléversement de l'APK généré en tant qu'artefact
+      # Étape 10: Téléversement de l'APK généré en tant qu'artefact
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
